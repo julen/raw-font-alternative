@@ -10,6 +10,7 @@ var KEY_UP        = 38;
 var KEY_RIGHT     = 39;
 var KEY_DOWN      = 40;
 var KEY_DELETE    = 46;
+var KEY_LETTER_F  = 70;
 
 var LF = "\n";
 var SYMBOL_LF = "\u240A";
@@ -105,7 +106,7 @@ function raw2sym(s) {
 	return s;
 }
 
-function adjustSelection(element, keyCode) {
+function adjustSelection(element, moveRight) {
 	var start = element.selectionStart;
 	var end = element.selectionEnd;
 	var s = element.value;
@@ -126,7 +127,7 @@ function adjustSelection(element, keyCode) {
 	// move it one symbol to the right or to the left
 	// depending on the keyCode
 	if (insideLF) {
-		element.selectionEnd = keyCode == KEY_RIGHT ? end + 1 : end - 1;
+		element.selectionEnd = moveRight ? end + 1 : end - 1;
 		if (start == end) {
 			element.selectionStart = element.selectionEnd;
 		}
@@ -149,15 +150,16 @@ function onMouseUp(e) {
 }
 
 function onKeyDown(e) {
-	// if we are about to move caret, request selection
-	// adjustment after the keydown event is processed
-	if (e.keyCode >= KEY_PAGEUP && e.keyCode <= KEY_DOWN) {
-		var self = this;
-		setTimeout(function() {
-			adjustSelection(self, e.keyCode);
-		}, 0);
-		return;
-	}
+	// request selection adjustment
+	// after the keydown event is processed
+
+	// on Mac, there's a Control+F alternative to pressing right arrow
+	var moveRight = e.keyCode == KEY_RIGHT || (e.ctrlKey && e.keyCode == KEY_LETTER_F);
+
+	var self = this;
+	setTimeout(function() {
+		adjustSelection(self, moveRight);
+	}, 0);
 
 	var start = this.selectionStart;
 	var end = this.selectionEnd;
