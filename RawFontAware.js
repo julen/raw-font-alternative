@@ -186,6 +186,28 @@ function onKeyDown(e) {
 	}
 }
 
+function onCopyOrCut(e) {
+	// on cut or copy, we want to have raw text in clipboard
+	// (without special characters) for interoperability
+	// with other applications and parts of the UI
+
+	// cancel the default event
+	e.preventDefault();
+
+	// get selection, convert it and put into clipboard
+	var start = this.selectionStart;
+	var end = this.selectionEnd;
+	var selection = sym2raw(this.value.substring(start, end))
+
+	// IE11 uses `Text` instead of `text/plain` content type
+	// and global window.clipboardData instead of e.clipboardData
+	if (e.clipboardData) {
+		e.clipboardData.setData('text/plain', selection);
+	} else {
+		window.clipboardData.setData('Text', selection);
+	}
+}
+
 function updateTextarea(element, insertValue) {
 	var start = element.selectionStart;
 	var end = element.selectionEnd;
@@ -211,6 +233,8 @@ function mountTextarea(element) {
 	element.addEventListener('keydown', onKeyDown);
 	element.addEventListener('mousedown', onMouseDown);
 	element.addEventListener('mouseup', onMouseUp);
+	element.addEventListener('copy', onCopyOrCut);
+	element.addEventListener('cut', onCopyOrCut);
 }
 
 function getValue(element) {
