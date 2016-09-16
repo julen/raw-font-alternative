@@ -114,7 +114,7 @@ function adjustSelection(element, moveRight) {
 	var charBefore = s.substr(end-1, 1);
 	var charAfter = s.substr(end, 1);
 	var insideLF = charBefore == SYMBOL_LF && charAfter == LF;
-	var selection = end < start ? s.substring(end, start) : s.substring(start, end);
+	var selection = s.substring(start, end);
 
 	// if newline is selected via mouse double-click,
 	// expand the selection to include the preceding LF symbol
