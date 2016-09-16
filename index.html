@@ -70,6 +70,16 @@
           mountTextarea(this.refs.textarea);
         },
 
+        setValue: function (value) {
+          this.refs.textarea.focus();
+          this.props.onChange(setValue(this.refs.textarea, value));
+        },
+
+        insertAtCaret: function (value) {
+          this.refs.textarea.focus();
+          this.props.onChange(insertAtCaret(this.refs.textarea, value));
+        },
+
         handleChange: function () {
           this.props.onChange(getValue(this.refs.textarea));
         },
@@ -99,6 +109,14 @@
           this.setState({ value: newValue });
         },
 
+        handleResetButtonClick: function(e) {
+          this.refs.rawtextarea.setValue(initialText);
+        },
+
+        handleInsertButtonClick: function(e) {
+          this.refs.rawtextarea.insertAtCaret('{FOO}');
+        },
+
         render: function() {
           return (
             React.DOM.div(
@@ -106,7 +124,14 @@
               RawFontTextareaFactory({
                 defaultValue: this.props.initialValue,
                 onChange: this.handleChange,
+                ref: 'rawtextarea'
               }),
+              React.DOM.button({
+                onClick: this.handleResetButtonClick
+              }, 'Reset value'),
+              React.DOM.button({
+                onClick: this.handleInsertButtonClick
+              }, 'Insert "{FOO}" at caret'),
               React.DOM.p(null, 'State value'),
               React.DOM.p(
                 { className: 'state-value' },
@@ -123,12 +148,12 @@
           return (
             React.DOM.div(null,
               React.DOM.div(
-                { id: 'ltr' }, 
+                { id: 'ltr' },
                 React.DOM.p(null, 'Textarea (LTR)'),
                 MiniEditorFactory({ initialValue: initialText })
               ),
               React.DOM.div(
-                { id: 'rtl' }, 
+                { id: 'rtl' },
                 React.DOM.p(null, 'Textarea (RTL)'),
                 MiniEditorFactory({ initialValue: initialText })
               )

@@ -186,15 +186,15 @@ function onKeyDown(e) {
 	}
 }
 
-function updateTextarea(element) {
+function updateTextarea(element, insertValue) {
 	var start = element.selectionStart;
 	var end = element.selectionEnd;
 	var s = element.value;
 	var sBefore = s.substring(0, end);
 	var sAfter = s.substring(end);
-	var sBeforeNormalized = raw2sym(sym2raw(sBefore));
+	var sBeforeNormalized = raw2sym(sym2raw(sBefore + (insertValue || "")));
 	var offset = sBeforeNormalized.length - sBefore.length;
-	element.value = raw2sym(sym2raw(s));
+	element.value = sBeforeNormalized + raw2sym(sym2raw(sAfter));
 	element.selectionEnd = end + offset;
 	if (start == end) {
 		element.selectionStart = end + offset;
@@ -215,4 +215,14 @@ function mountTextarea(element) {
 
 function getValue(element) {
 	return sym2raw(element.value);
+}
+
+function setValue(element, value) {
+	element.value = raw2sym(value);
+	return getValue(element);
+}
+
+function insertAtCaret(element, value) {
+	updateTextarea(element, value);
+	return getValue(element);
 }
