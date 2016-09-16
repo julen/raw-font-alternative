@@ -203,6 +203,14 @@ function onInput(e) {
 	updateTextarea(this);
 }
 
+function mountTextarea(element) {
+	updateTextarea(element);
+	element.addEventListener('input', onInput);
+	element.addEventListener('keydown', onKeyDown);
+	element.addEventListener('mousedown', onMouseDown);
+	element.addEventListener('mouseup', onMouseUp);
+}
+
 function getValue(element) {
-  return sym2raw(element.value);
+	return sym2raw(element.value);
 }

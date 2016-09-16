@@ -67,12 +67,7 @@
         },
 
         componentDidMount: function() {
-          var textarea = this.refs.textarea;
-          updateTextarea(textarea);
-          textarea.addEventListener('input', onInput);
-          textarea.addEventListener('keydown', onKeyDown);
-          textarea.addEventListener('mousedown', onMouseDown);
-          textarea.addEventListener('mouseup', onMouseUp);
+          mountTextarea(this.refs.textarea);
         },
 
         handleChange: function () {
