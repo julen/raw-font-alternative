@@ -10,6 +10,7 @@ var KEY_UP        = 38;
 var KEY_RIGHT     = 39;
 var KEY_DOWN      = 40;
 var KEY_DELETE    = 46;
+var KEY_LETTER_F  = 70;
 
 var LF = "\n";
 var SYMBOL_LF = "\u240A";
@@ -105,7 +106,7 @@ function raw2sym(s) {
 	return s;
 }
 
-function adjustSelection(element, keyCode) {
+function adjustSelection(element, moveRight) {
 	var start = element.selectionStart;
 	var end = element.selectionEnd;
 	var s = element.value;
@@ -113,7 +114,7 @@ function adjustSelection(element, keyCode) {
 	var charBefore = s.substr(end-1, 1);
 	var charAfter = s.substr(end, 1);
 	var insideLF = charBefore == SYMBOL_LF && charAfter == LF;
-	var selection = end < start ? s.substring(end, start) : s.substring(start, end);
+	var selection = s.substring(start, end);
 
 	// if newline is selected via mouse double-click,
 	// expand the selection to include the preceding LF symbol
@@ -126,7 +127,7 @@ function adjustSelection(element, keyCode) {
 	// move it one symbol to the right or to the left
 	// depending on the keyCode
 	if (insideLF) {
-		element.selectionEnd = keyCode == KEY_RIGHT ? end + 1 : end - 1;
+		element.selectionEnd = moveRight ? end + 1 : end - 1;
 		if (start == end) {
 			element.selectionStart = element.selectionEnd;
 		}
@@ -149,15 +150,16 @@ function onMouseUp(e) {
 }
 
 function onKeyDown(e) {
-	// if we are about to move caret, request selection
-	// adjustment after the keydown event is processed
-	if (e.keyCode >= KEY_PAGEUP && e.keyCode <= KEY_DOWN) {
-		var self = this;
-		setTimeout(function() {
-			adjustSelection(self, e.keyCode);
-		}, 0);
-		return;
-	}
+	// request selection adjustment
+	// after the keydown event is processed
+
+	// on Mac, there's a Control+F alternative to pressing right arrow
+	var moveRight = e.keyCode == KEY_RIGHT || (e.ctrlKey && e.keyCode == KEY_LETTER_F);
+
+	var self = this;
+	setTimeout(function() {
+		adjustSelection(self, moveRight);
+	}, 0);
 
 	var start = this.selectionStart;
 	var end = this.selectionEnd;
@@ -184,15 +186,37 @@ function onKeyDown(e) {
 	}
 }
 
-function updateTextarea(element) {
+function onCopyOrCut(e) {
+	// on cut or copy, we want to have raw text in clipboard
+	// (without special characters) for interoperability
+	// with other applications and parts of the UI
+
+	// cancel the default event
+	e.preventDefault();
+
+	// get selection, convert it and put into clipboard
+	var start = this.selectionStart;
+	var end = this.selectionEnd;
+	var selection = sym2raw(this.value.substring(start, end))
+
+	// IE11 uses `Text` instead of `text/plain` content type
+	// and global window.clipboardData instead of e.clipboardData
+	if (e.clipboardData) {
+		e.clipboardData.setData('text/plain', selection);
+	} else {
+		window.clipboardData.setData('Text', selection);
+	}
+}
+
+function updateTextarea(element, insertValue) {
 	var start = element.selectionStart;
 	var end = element.selectionEnd;
 	var s = element.value;
 	var sBefore = s.substring(0, end);
 	var sAfter = s.substring(end);
-	var sBeforeNormalized = raw2sym(sym2raw(sBefore));
+	var sBeforeNormalized = raw2sym(sym2raw(sBefore + (insertValue || "")));
 	var offset = sBeforeNormalized.length - sBefore.length;
-	element.value = raw2sym(sym2raw(s));
+	element.value = sBeforeNormalized + raw2sym(sym2raw(sAfter));
 	element.selectionEnd = end + offset;
 	if (start == end) {
 		element.selectionStart = end + offset;
@@ -203,6 +227,26 @@ function onInput(e) {
 	updateTextarea(this);
 }
 
+function mountTextarea(element) {
+	updateTextarea(element);
+	element.addEventListener('input', onInput);
+	element.addEventListener('keydown', onKeyDown);
+	element.addEventListener('mousedown', onMouseDown);
+	element.addEventListener('mouseup', onMouseUp);
+	element.addEventListener('copy', onCopyOrCut);
+	element.addEventListener('cut', onCopyOrCut);
+}
+
 function getValue(element) {
-  return sym2raw(element.value);
+	return sym2raw(element.value);
+}
+
+function setValue(element, value) {
+	element.value = raw2sym(value);
+	return getValue(element);
+}
+
+function insertAtCaret(element, value) {
+	updateTextarea(element, value);
+	return getValue(element);
 }
