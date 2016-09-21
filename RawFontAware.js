@@ -206,6 +206,11 @@ function onCopyOrCut(e) {
 	} else {
 		window.clipboardData.setData('Text', selection);
 	}
+
+	// replace current selection with the empty string
+	// (otherwise with the default event being cancelled
+	// the selection won't be deleted)
+	if (e.type == 'cut') insertAtCaret(e.target, '');
 }
 
 function updateTextarea(element, insertValue) {
