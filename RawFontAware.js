@@ -209,14 +209,15 @@ function onCopyOrCut(e) {
 }
 
 function updateTextarea(element, insertValue) {
+	insertValue = insertValue || '';
 	var start = element.selectionStart;
 	var end = element.selectionEnd;
 	var s = element.value;
 	var sBefore = s.substring(0, end);
 	var sAfter = s.substring(end);
-	var sBeforeNormalized = raw2sym(sym2raw(sBefore + (insertValue || "")));
+	var sBeforeNormalized = raw2sym(sym2raw(sBefore + insertValue));
 	var offset = sBeforeNormalized.length - sBefore.length;
-	var newValue = sBeforeNormalized + raw2sym(sym2raw(sAfter));
+	var newValue = raw2sym(sym2raw(sBefore + insertValue + sAfter));
 	if (s == newValue) return;
 	element.value = newValue;
 	element.selectionEnd = end + offset;
