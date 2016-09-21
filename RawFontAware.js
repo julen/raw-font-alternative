@@ -216,7 +216,9 @@ function updateTextarea(element, insertValue) {
 	var sAfter = s.substring(end);
 	var sBeforeNormalized = raw2sym(sym2raw(sBefore + (insertValue || "")));
 	var offset = sBeforeNormalized.length - sBefore.length;
-	element.value = sBeforeNormalized + raw2sym(sym2raw(sAfter));
+	var newValue = sBeforeNormalized + raw2sym(sym2raw(sAfter));
+	if (s == newValue) return;
+	element.value = newValue;
 	element.selectionEnd = end + offset;
 	if (start == end) {
 		element.selectionStart = end + offset;
