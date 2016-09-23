@@ -1,4 +1,4 @@
-var RAW_MODE = true; // emulate "Raw" mode with full conversion logic
+var RAW_MODE = false; // emulate "Raw" mode with full conversion logic
 
 var KEY_BACKSPACE =  8;
 var KEY_PAGEUP    = 33;
@@ -88,8 +88,10 @@ function sym2raw(s) {
 }
 
 function raw2sym(s) {
-	// multiple spaces
-	s = s.replace(/ {2,}/g, spaceReplacer);
+	// in RAW_MODE, replace all spaces;
+	// otherwise, replace two or more spaces in a row
+	s = RAW_MODE ? s.replace(/ /g, spaceReplacer):
+				   s.replace(/ {2,}/g, spaceReplacer);
 	// leading line spaces
 	s = s.replace(/\n /g, leadingSpaceReplacer);
 	// trailing line spaces
