@@ -238,7 +238,29 @@ function updateTextarea(element, insertValue) {
 }
 
 function onInput(e) {
-	updateTextarea(this);
+	if (!this.isComposing) updateTextarea(this);
+	this.requestUpdate = false;
+}
+
+function onCompositionStart(e) {
+	this.isComposing = true;
+}
+
+function onCompositionEnd(e) {
+	this.isComposing = false;
+	// this event is fired after `input` one on Chrome 53+,
+	// so in order to actually update the textarea, we need
+	// to do this explicitly; for other browsers this means
+	// that updateTextarea() would run twice and not in the
+	// desired order; so we request this update *after* the
+	// default `input` event is processed, and will only run
+	// updateTextarea() if it wasn't processed by the native
+	// `input` event (on browsers other than Chrome)
+	var self = this;
+	self.requestUpdate = true;
+	setTimeout(function() {
+		if (self.requestUpdate) updateTextarea(self);
+	}, 0);
 }
 
 function mountTextarea(element) {
@@ -249,6 +271,8 @@ function mountTextarea(element) {
 	element.addEventListener('mouseup', onMouseUp);
 	element.addEventListener('copy', onCopyOrCut);
 	element.addEventListener('cut', onCopyOrCut);
+	element.addEventListener('compositionstart', onCompositionStart);
+	element.addEventListener('compositionend', onCompositionEnd);
 }
 
 function getValue(element) {
