@@ -165,6 +165,11 @@ function onKeyDown(e) {
 	var end = this.selectionEnd;
 	var s = this.value;
 
+	// IE11 sometimes has start/end set past the actual string length,
+	// so adjust the selection to be able to get proper charBefore/charAfter values
+	if (start > s.length) start = s.length;
+	if (end > s.length) end = s.length;
+
 	var charBefore = s.substr(end-1, 1);
 	var charAfter = s.substr(end, 1);
 
