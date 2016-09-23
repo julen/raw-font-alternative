@@ -178,7 +178,7 @@ function onKeyDown(e) {
 		// before LF symbol, select two characters to the right
 		// to delete them in one step
 		if (e.keyCode == KEY_DELETE && charAfter == SYMBOL_LF) {
-			this.selectionEnd = this.selectionEnd + 2;
+			this.selectionEnd = end + 2;
 			return;
 		}
 
@@ -186,7 +186,7 @@ function onKeyDown(e) {
 		// after newline character, select two characters to the left
 		// to delete them in one step
 		if (e.keyCode == KEY_BACKSPACE && charBefore == LF) {
-			this.selectionStart = this.selectionStart - 2;
+			this.selectionStart = start - 2;
 		}
 	}
 }
