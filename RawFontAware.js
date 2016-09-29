@@ -155,8 +155,9 @@ function onKeyDown(e) {
 	// request selection adjustment
 	// after the keydown event is processed
 
-	// on Mac, there's a Control+F alternative to pressing right arrow
-	var moveRight = e.keyCode == KEY_RIGHT || (e.ctrlKey && e.keyCode == KEY_LETTER_F);
+	// on Mac, there's a Control+F alternative to pressing right arrow.
+	// Also avoid triggering the behavior for pressing the end key in Mac.
+	var moveRight = (e.keyCode == KEY_RIGHT && !e.metaKey) || (e.ctrlKey && e.keyCode == KEY_LETTER_F);
 
 	var self = this;
 	setTimeout(function() {
