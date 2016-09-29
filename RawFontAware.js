@@ -94,7 +94,7 @@ function sym2raw(s) {
 function raw2sym(s) {
 	// in RAW_MODE, replace all spaces;
 	// otherwise, replace two or more spaces in a row
-	s = RAW_MODE ? s.replace(/ /g, spaceReplacer):
+	s = RAW_MODE ? s.replace(/ +/g, spaceReplacer):
 				   s.replace(/ {2,}/g, spaceReplacer);
 	// leading line spaces
 	s = s.replace(/\n /g, leadingSpaceReplacer);
