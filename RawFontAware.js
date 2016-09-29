@@ -49,6 +49,10 @@ function leadingSpaceReplacer(match) {
 	return LF + spaceReplacer(match.substring(1));
 }
 
+function surroundingSpaceReplacer(match) {
+	return match.substring(0).replace(/ +/g, spaceReplacer);
+}
+
 function trailingSpaceReplacer(match) {
 	return spaceReplacer(match.substring(1)) + LF;
 }
@@ -96,6 +100,10 @@ function raw2sym(s) {
 	s = s.replace(/\n /g, leadingSpaceReplacer);
 	// trailing line spaces
 	s = s.replace(/ \n/g, trailingSpaceReplacer);
+	// space before TAB or NBSP
+	s = s.replace(/ [\t\u00A0]/g, surroundingSpaceReplacer);
+	// space after TAB or NBSP
+	s = s.replace(/[\t\u00A0] /g, surroundingSpaceReplacer);
 	// single leading document space
 	s = s.replace(/^ /, spaceReplacer);
 	// single trailing document space
